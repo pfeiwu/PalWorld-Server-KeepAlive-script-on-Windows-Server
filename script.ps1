@@ -57,12 +57,12 @@ if (-not $steamCmdPath.EndsWith("\")) {
 
 $executablePath = "${steamCmdPath}steamapps\common\PalServer\Pal\Binaries\Win64\PalServer-Win64-Test-Cmd.exe"
 # 开始主循环
-while ($true) {
+while ($true) { 
     Clear-Host
     Write-Host "服务器路径: $executablePath"
     # 显示当前策略
     Write-Host "当前重启策略: $restartPolicy"
-
+    
     # 如果是定时重启，显示下一次重启时间
     if ($restartPolicy -eq "定时重启") {
         Write-Host "下一次重启时间: $nextRestartTime"
