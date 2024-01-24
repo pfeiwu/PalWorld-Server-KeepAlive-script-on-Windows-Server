@@ -10,6 +10,7 @@ $restartInterval = 0
 $restartPolicy = ""
 $restartTimeInput = $null
 $nowDate = Get-Date
+$rconPassword = $null
 
 function Read-HostAsInt
 {
@@ -133,8 +134,7 @@ if ($backupSavedFolderInput -eq "1")
     $savedBackUpSizeThresholdInMB = Read-HostAsInt "请输入备份文件夹大小阈值（MB）, 如果超过这个阈值，将会删除最早的备份文件"
     $lastBackupTime = $null
 }
-
-
+$rconPassword = Read-Host "请输入RCON密码, 如果不需要RCON预警功能，请留空"
 # 开始主循环
 while ($true)
 {
@@ -251,14 +251,18 @@ while ($true)
 
     Write-Host "当前内存使用占比: $memUsageValue %"
     # 如果内存使用率超过阈值，发送服务器内警报
-    if ($memUsageValue -ge 98)
+    if ($rconPassword -ne $null)
     {
-        arrcon -H 127.0.0.1 -P 25575 -p kuroameserver "Broadcast alert_mem_committed_percent:$memUsageValue%"
+        if ($memUsageValue -ge 98)
+        {
+            arrcon -H 127.0.0.1 -P 25575 -p $rconPassword "Broadcast alert_mem_committed_percent:$memUsageValue%"
+        }
+        if ($memUsageValue -ge 99)
+        {
+            arrcon -H 127.0.0.1 -P 25575 -p $rconPassword "Broadcast this_server_will_reboot_soon_due_to_memory_leakage"
+        }
     }
-    if ($memUsageValue -ge 99)
-    {
-        arrcon -H 127.0.0.1 -P 25575 -p kuroameserver "Broadcast this_server_will_reboot_soon_due_to_memory_leakage"
-    }
+
     $arrconShowPlayersResp = arrcon -H 127.0.0.1 -P 25575 -p kuroameserver showPlayers
 
     # 将输出按行分割为数组
