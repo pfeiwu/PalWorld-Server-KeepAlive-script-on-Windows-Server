@@ -139,4 +139,5 @@ while ($true) {
 
     # 等待一段时间
     Start-Sleep -Seconds 30
+
 }
