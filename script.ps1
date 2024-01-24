@@ -134,7 +134,7 @@ if ($backupSavedFolderInput -eq "1")
     $savedBackUpSizeThresholdInMB = Read-HostAsInt "请输入备份文件夹大小阈值（MB）, 如果超过这个阈值，将会删除最早的备份文件"
     $lastBackupTime = $null
 }
-$rconPassword = Read-Host "请输入RCON密码, 如果不需要RCON预警功能，请留空"
+$rconPassword = Read-Host "请输入RCON密码, 如果不需要RCON预警功能和在线玩家列表，请留空"
 # 开始主循环
 while ($true)
 {
@@ -261,41 +261,41 @@ while ($true)
         {
             arrcon -H 127.0.0.1 -P 25575 -p $rconPassword "Broadcast this_server_will_reboot_soon_due_to_memory_leakage"
         }
-    }
 
-    $arrconShowPlayersResp = arrcon -H 127.0.0.1 -P 25575 -p kuroameserver showPlayers
+        $arrconShowPlayersResp = arrcon -H 127.0.0.1 -P 25575 -p kuroameserver showPlayers
+        # 将输出按行分割为数组
+        $playerLines = $arrconShowPlayersResp -split "`r`n"
 
-    # 将输出按行分割为数组
-    $playerLines = $arrconShowPlayersResp -split "`r`n"
+        # 创建一个数组来存储玩家对象
+        $playerList = @()
 
-    # 创建一个数组来存储玩家对象
-    $playerList = @()
-
-    foreach ($line in $playerLines)
-    {
-        # 忽略空行、非数据行和表头行
-        if (-not [string]::IsNullOrWhiteSpace($line) -and $line -notmatch "playeruid|name|steamid")
+        foreach ($line in $playerLines)
         {
-            # 分割玩家信息
-            $playerFields = $line -split "," | ForEach-Object { $_.Trim() }
-
-            # 检查是否有三个字段（姓名，UID，SteamID）
-            if ($playerFields.Count -eq 3)
+            # 忽略空行、非数据行和表头行
+            if (-not [string]::IsNullOrWhiteSpace($line) -and $line -notmatch "playeruid|name|steamid")
             {
-                # 创建一个自定义对象并添加到数组
-                $playerObj = New-Object PSObject -Property @{
-                    姓名 = $playerFields[0]
-                    UID = $playerFields[1]
-                    SteamID = $playerFields[2]
-                }
+                # 分割玩家信息
+                $playerFields = $line -split "," | ForEach-Object { $_.Trim() }
 
-                $playerList += $playerObj
+                # 检查是否有三个字段（姓名，UID，SteamID）
+                if ($playerFields.Count -eq 3)
+                {
+                    # 创建一个自定义对象并添加到数组
+                    $playerObj = New-Object PSObject -Property @{
+                        姓名 = $playerFields[0]
+                        UID = $playerFields[1]
+                        SteamID = $playerFields[2]
+                    }
+
+                    $playerList += $playerObj
+                }
             }
         }
+        # 输出表格
+        Write-Host "在线玩家:"
+        $playerList | Format-Table -AutoSize
     }
-    # 输出表格
-    Write-Host "在线玩家:"
-    $playerList | Format-Table -AutoSize
+
     # 等待一段时间
     Start-Sleep -Seconds 30
 }
