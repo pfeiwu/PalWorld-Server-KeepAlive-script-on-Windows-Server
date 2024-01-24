@@ -262,7 +262,7 @@ while ($true)
             arrcon -H 127.0.0.1 -P 25575 -p $rconPassword "Broadcast this_server_will_reboot_soon_due_to_memory_leakage"
         }
 
-        $arrconShowPlayersResp = arrcon -H 127.0.0.1 -P 25575 -p kuroameserver showPlayers
+        $arrconShowPlayersResp = arrcon -H 127.0.0.1 -P 25575 -p $rconPassword showPlayers
         # 将输出按行分割为数组
         $playerLines = $arrconShowPlayersResp -split "`r`n"
 
