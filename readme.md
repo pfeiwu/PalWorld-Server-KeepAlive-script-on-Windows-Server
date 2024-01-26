@@ -11,7 +11,7 @@
     - 语法错误（缺少语句块，etc）：代码是用UTF-8编码保存的，很多Windows版本默认不支持，需要在系统的区域设置打开UTF-8支持（控制面板-时钟和区域-区域-管理-更改系统区域设置-选中Beta版：使用Unicode UTF-8提供全球语言支持）
     - 不允许执行 ： 需要将执行策略改成RemoteSigned,或者Unrestricted 例如：Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted -Force
 - arrcon连接超时或失败
-    - 目前发现PalWorld服务端会出现对RCON命令没有响应的情况，不影响基本功能
+    - 目前发现如果服务器上玩家有非英文字符，ShowPlayers指令会超时，会使在线玩家列表无法展示，不影响其他功能
 - 找不到arrcon
     - 需要下载arrcon程序，并将其路径加到系统环境变量Path里面，这个ARRCON可以在github上搜到
 - RCON密码是什么？
